@@ -7,6 +7,8 @@ import re
 
 class lexerClass:
     out_file: str = ""
+    count_pos = 1  # Счетчик символов. Его время от времени будем сбрасывать
+    last_line = 0  # Переменная для хранения номера прошлой строки. Если не совпадает, надо сбросить count
 
     def __init__(self, out_file="result.out"):
         self.out_file = out_file
@@ -81,19 +83,19 @@ class lexerClass:
 
     def t_SCREAM(self, t):
         r'!'
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_SEMICOLON(self, t):
         r';'
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_COMMA(self, t):
         r','
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_POINT(self, t):
         r'\.'
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_NUMBER(self, t):
         r'\d+'
@@ -115,15 +117,15 @@ class lexerClass:
 
     def t_PLUS(self, t):
         r"\+"
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_MINUS(self, t):
         r"-"
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_TIMES(self, t):
         r"\*"
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     """
     Итак, возникла проблема, связанная с тем, что регулярное выражение вида r'/'
@@ -142,49 +144,50 @@ class lexerClass:
         r'/'  # /[^\*\/]
         # r"((%s)|(\d))\/((%s)|(\d))"%(t_IDENTIFIER, t_IDENTIFIER)
         # "(([a - zA - Z_]([a - zA - Z0 - 9_]{1, 30})?) | (\d))\ / (([a - zA - Z_]([a - zA - Z0 - 9_]{1, 30})?) | (\d))"
-        return t, "ASCII code: %s" % str(ord(str(t.value)[0]))  # Костыльный костыль
+        return t
 
     def t_ASSIGNMENT(self, t):
         r"="
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_OPEN_ROUND_BRACKET(self, t):
         r"\("
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_CLOSE_ROUND_BRACKET(self, t):
         r"\)"
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_OPEN_SQUARE_BRACKET(self, t):
         r'\['
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_CLOSE_SQUARE_BRACKET(self, t):
         r'\]'
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_OPEN_BRACE(self, t):
         r'\{'
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_CLOSE_BRACE(self, t):
         r'\}'
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_LESS_CHAR(self, t):
         r"<"
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     def t_MORE_CHAR(self, t):
         r">"
-        return t, "ASCII code: %s" % str(ord(str(t.value)))
+        return t
 
     t_ignore = " \r\t\f"
 
     def t_newline(self, t):
         r'\n+'
         t.lexer.lineno += t.value.count("\n")
+        self.count_pos += 1
 
     def t_error(self, t):
         # print("Illegal character %s" % t.value[0])
@@ -201,21 +204,19 @@ class lexerClass:
                 tok = lexer.token()
                 if not tok:
                     break
-                print(tok)
-                # Излишни запутанный код чтобы по********ся
-                if type(tok).__name__ == "tuple":
-                    token, ord_value = tok
-                    token = token.__dict__
-                    file.write("{0} line {1} cols {2}-{3} is {4}\n".format(str(token["value"]), str(token["lineno"]),
-                                                                           str(token["lexpos"]),
-                                                                           str(len(str(token["value"]))+token["lexpos"]),
-                                                                           str(token["type"])))
-                else:
-                    token = tok.__dict__
-                    file.write("{0} line {1} cols {2}-{3} is {4}\n".format(str(token["value"]), str(token["lineno"]),
-                                                                           str(token["lexpos"]),
-                                                                           str(len(str(token["value"]))+token["lexpos"]),
-                                                                           str(token["type"])))
+                # print(tok)
+                token = tok.__dict__
+                file.write("{0} line {1} cols {2}-{3} is {4}\n".format(str(token["value"]), str(token["lineno"]),
+                                                                       str(token["lexpos"]-self.count_pos+2),
+                                                                       str(len(str(token["value"]))+token["lexpos"]),
+                                                                       str(token["type"])))
+                # if token["lineno"] != self.last_line:
+                #     self.count_pos += len(str(token["value"]))
+                self.count_pos += len(str(token["value"]))
+                self.last_line = token["lineno"]
+
+        self.last_line = 0
+        self.count_pos = 1
 
 
 if __name__ == "__main__":
