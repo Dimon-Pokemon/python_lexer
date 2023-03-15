@@ -4,3 +4,5 @@ outTest
 venv
 .log
 venv
+.DS_Store
+.idea
