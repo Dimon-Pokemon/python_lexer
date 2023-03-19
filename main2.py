@@ -8,7 +8,8 @@ import re
 class lexerClass:
     out_file: str = ""
     count_pos = 1  # Счетчик символов. Его время от времени будем сбрасывать
-    last_line = 0  # Переменная для хранения номера прошлой строки. Если не совпадает, надо сбросить count
+    last_line = 1  # Переменная для хранения номера прошлой строки. Если не совпадает, надо сбросить count
+    file = "";
 
     def __init__(self, out_file="result.out"):
         self.out_file = out_file
@@ -186,37 +187,39 @@ class lexerClass:
 
     def t_newline(self, t):
         r'\n+'
+        self.last_line = t.lexer.lineno
         t.lexer.lineno += t.value.count("\n")
         self.count_pos += 1
 
     def t_error(self, t):
-        # print("Illegal character %s" % t.value[0])
-        with open(self.out_file, "a") as f:
-            f.write("Illegal character %s\n" % t.value[0])
+        #with open(self.out_file, "a") as f:
+        #print(f"\n*** Error line {self.last_line}\n", file=self.file)
+        self.file.writelines([f"\n*** Error line {self.last_line}\n", f"*** Unrecognized char: '{t.value[0]}'\n"])
         t.lexer.skip(1)
 
     def start(self, data: str, out_file="outTest/result.txt"):
         self.out_file = out_file
         lexer = lex.lex(object=self)
         lexer.input(data)
-        with open(self.out_file, "w") as file:
-            while True:
+        with open(self.out_file, "w") as self.file:
+            for i in range(len(data)):
                 tok = lexer.token()
                 if not tok:
                     break
                 # print(tok)
                 token = tok.__dict__
-                file.write("{0} line {1} cols {2}-{3} is {4}\n".format(str(token["value"]), str(token["lineno"]),
-                                                                       str(token["lexpos"]-self.count_pos+2),
-                                                                       str(len(str(token["value"]))+token["lexpos"]),
-                                                                       str(token["type"])))
-                # if token["lineno"] != self.last_line:
-                #     self.count_pos += len(str(token["value"]))
-                self.count_pos += len(str(token["value"]))
-                self.last_line = token["lineno"]
+                if token["lineno"] == self.last_line and i != 0:
+                    self.count_pos += len(str(token["value"]))
+                else:
+                    self.count_pos = 1
+                self.file.write("{0} line {1} cols {2}-{3} is {4}\n".format(str(token["value"]), str(token["lineno"]),
+                                                                       str(self.count_pos),
+                                                                       str(len(str(token["value"]))+self.count_pos-1),
+                                                                       "T_"+str(token["type"])))
 
-        self.last_line = 0
-        self.count_pos = 1
+                self.last_line = token["lineno"]
+            self.last_line = 1
+            self.count_pos = 1
 
 
 if __name__ == "__main__":
