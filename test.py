@@ -15,6 +15,7 @@ class MyTestCase(unittest.TestCase):
             file_name = "outTest/" + match(".*\.", file).group(0) + "out"  # Путь до выходного файла.
             correct_file_name = "correctOut/" + match(".*\.", file).group(0) + "out"
             if match(".*\.frag", file):  # Если текущий файл - входной, то:
+                print(f"\033[0;33mТест № {files.index(file) + 1}\033[0;0m")
                 print("Тестирование файла:" + f"\033[0;33m{file}\033[0;0m")  # Вывод информации о тестируемом файле.
                 with open("inputData/%s" % file) as f:  # Открываем файл под псевдонимом 'f'.
                     data: str = f.read()  # Считываем весь файл в виде одной строки в переменную data
@@ -31,9 +32,9 @@ class MyTestCase(unittest.TestCase):
                         # self.assertEqual(output_data, correct_data)
                         # self.assertCountEqual(output_data, correct_data)
                         if output_data.lower() == correct_data.lower():
-                            print(f"\033[3;32mТест № {files.index(file)+1} пройден! \033[0;0m")
+                            print(f"\033[3;32mТест № {files.index(file)+1} пройден! \033[0;0m\n")
                         else:
-                            print(f"\033[3;31mТест № {files.index(file) + 1} НЕ пройден! \033[0;0m")
+                            print(f"\033[3;31mТест № {files.index(file) + 1} НЕ пройден! \033[0;0m\n")
         self.assertEqual(True, True)
 
 

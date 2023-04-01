@@ -8,6 +8,13 @@ class lexerClass:
     last_line = 0  # Переменная для хранения номера прошлой строки. Если не совпадает, надо сбросить count
     len_last_token = 0
     file = ""
+    '''
+     Сохранение значения токена-числа, в изначальном виде. 
+     Потому что при преобразовании к Double или Intупук число преобразуется в 10 с.с. 
+     и представляется в десятичном виде.
+     Например 0x0 преобразуется в 0, 1.2E2 в 120.0
+     '''
+    first_value_digit = 0
 
     def __init__(self, out_file="result.out"):
         self.out_file = out_file
@@ -38,8 +45,9 @@ class lexerClass:
     # Tokens
 
     def t_DOUBLE_NUMBER(self, t):
-        r'((0([1][0-9]{0,18})?)|([1-9][0-9]{0,19}))\.[0-9]{0,100}((E|e)(\+|-)?([1-9][0-9]?))?' #[0-9][0-9]{0,10}\.[0-9]{0,100}((E|e)(\+|-)?([1-9][0-9]?))?
+        r'((0([1][0-9]{0,18})?)|([1-9][0-9]{0,19}))\.[0-9]{0,100}((E|e)(\+|-)?([[0-9]{1,4}))?'
         try:
+            self.first_value_digit = t.value
             t.value = float128(t.value)
         except ValueError:
             print("Double value too large ", t.value)
@@ -49,10 +57,16 @@ class lexerClass:
     def t_NUMBER(self, t):
         r'(0(x|X)[0-9a-fA-F]+)|(\d+)'
         try:
+            self.first_value_digit = t.value
             t.value = int(t.value)
-        except TypeError:
-            t.value = int(t.value, 16)
         except ValueError:
+            # Костыльное решение. Связанное с возможностью записи числа в 16 системе счисления
+            try:
+                t.value = int(t.value, 16)
+                return t
+            except ValueError:
+                print(f"Integer value too large {t.value}")
+                t.value = 0
             print(f"Integer value too large {t.value}")
             t.value = 0
         return t
@@ -118,6 +132,12 @@ class lexerClass:
         r'\}'
         return t
 
+    def t_MULTILINE_COMMENT(self, t):
+        r'\/\*(.|\n)*?\*\/'
+
+    def t_SINGLE_COMMENT(self, t):
+        r'//.*\n?'
+
     t_ignore = " \r\t\f"
 
     def t_newline(self, t):
@@ -133,7 +153,7 @@ class lexerClass:
         t.lexer.skip(1)
 
     def t_IDENTIFIER(self, t):
-        r'[a-zA-Z_]([a-zA-Z0-9_]{1,29})?' # Имя переменной. Длина не более 31 символа.
+        r'[a-zA-Z_]([a-zA-Z0-9_]{1,29})?'  # Имя переменной. Длина не более 31 символа.
         t.type = self.reserved.get(t.value, 'IDENTIFIER')
         return t
 
@@ -166,8 +186,8 @@ class lexerClass:
 
     tokens += list(reserved.values())
 
-    t_MULTILINE_COMMENT = r'\/\*(.|\n)*?\*\/'
-    t_SINGLE_COMMENT = r'//.*\n?'
+    #t_MULTILINE_COMMENT = r'\/\*(.|\n)*?\*\/'
+    #t_SINGLE_COMMENT = r'//.*\n?'
     t_DOUBLE_SQUARE_BRACKETS = r'\[\]'
     t_DOUBLE_ROUND_BRACKETS = r'\(\)'
     t_DOUBLE_BRACES = r'\{\}'
@@ -199,12 +219,23 @@ class lexerClass:
                     self.count_pos += self.len_last_token
                 else:
                     self.count_pos = 1
-                self.file.write("{0} line {1} cols {2}-{3} is {4}\n".format(str(token["value"]), str(token["lineno"]),
-                                                                            self.count_pos,
-                                                                            str(len(
-                                                                                str(token[
-                                                                                        "value"])) + self.count_pos - 1),
-                                                                            "T_" + str(token["type"])))
+                if str(token["type"]) in ("NUMBER", "DOUBLE_NUMBER"):
+                    self.file.write("{0} line {1} cols {2}-{3} is {4} (value = {5})\n".format(self.first_value_digit,
+                                                                                              str(token["lineno"]),
+                                                                                              self.count_pos,
+                                                                                              str(len(
+                                                                                                  str(token[
+                                                                                                          "value"])) + self.count_pos - 1),
+                                                                                              "T_" + str(token["type"]),
+                                                                                              str(token["value"])))
+                else:
+                    self.file.write(
+                        "{0} line {1} cols {2}-{3} is {4}\n".format(str(token["value"]), str(token["lineno"]),
+                                                                    self.count_pos,
+                                                                    str(len(
+                                                                        str(token[
+                                                                                "value"])) + self.count_pos - 1),
+                                                                    "T_" + str(token["type"])))
                 self.len_last_token = len(str(token["value"]))
                 self.last_line = token["lineno"]
 

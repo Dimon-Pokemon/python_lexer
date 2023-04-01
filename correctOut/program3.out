@@ -1,4 +1,4 @@
-class        line 3 cols 1-5 is T_Class 
+class        line 3 cols 1-5 is T_CLASS 
 Animal       line 3 cols 7-12 is T_Identifier 
 {            line 3 cols 14-14 is T_OPEN_BRACE 
 int          line 4 cols 3-5 is T_Int 
@@ -16,11 +16,11 @@ weight       line 6 cols 17-22 is T_Identifier
 =            line 6 cols 24-24 is T_ASSIGNMENT 
 weight       line 6 cols 26-31 is T_Identifier 
 *            line 6 cols 33-33 is T_TIMES 
-2.0          line 6 cols 35-37 is T_DOUBLE_NUMBER
+2.0          line 6 cols 35-37 is T_DOUBLE_NUMBER (value = 2.0)
 ;            line 6 cols 38-38 is T_SEMICOLON 
 }            line 6 cols 39-39 is T_CLOSE_BRACE 
 }            line 7 cols 1-1 is T_CLOSE_BRACE 
-class        line 9 cols 1-5 is T_Class 
+class        line 9 cols 1-5 is T_CLASS 
 Cow          line 9 cols 7-9 is T_Identifier 
 extends      line 9 cols 11-17 is T_Extends 
 Animal       line 9 cols 19-24 is T_Identifier 
@@ -40,7 +40,7 @@ main         line 14 cols 6-9 is T_Identifier
 (            line 14 cols 10-10 is T_OPEN_ROUND_BRACKET 
 )            line 14 cols 11-11 is T_CLOSE_ROUND_BRACKET 
 {            line 14 cols 13-13 is T_OPEN_BRACE 
-class        line 15 cols 3-7 is T_Class 
+class        line 15 cols 3-7 is T_CLASS 
 Cow          line 15 cols 9-11 is T_Identifier 
 betsy        line 15 cols 13-17 is T_Identifier 
 ;            line 15 cols 18-18 is T_SEMICOLON 
@@ -53,13 +53,13 @@ betsy        line 17 cols 3-7 is T_Identifier
 .            line 17 cols 8-8 is T_POINT 
 height       line 17 cols 9-14 is T_Identifier 
 =            line 17 cols 16-16 is T_ASSIGNMENT 
-0xa2         line 17 cols 18-21 is T_NUMBER
+0xa2         line 17 cols 18-21 is T_NUMBER (value = 162)
 ;            line 17 cols 22-22 is T_SEMICOLON 
 betsy        line 18 cols 3-7 is T_Identifier 
 .            line 18 cols 8-8 is T_POINT 
 weight       line 18 cols 9-14 is T_Identifier 
 =            line 18 cols 16-16 is T_ASSIGNMENT 
-1.456        line 18 cols 18-22 is T_DOUBLE_NUMBER
+1.456        line 18 cols 18-22 is T_DOUBLE_NUMBER (value = 1.456)
 ;            line 18 cols 23-23 is T_SEMICOLON 
 besty        line 19 cols 3-7 is T_Identifier 
 .            line 19 cols 8-8 is T_POINT 

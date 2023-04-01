@@ -3,7 +3,7 @@
 *** Unterminated string constant: "this is not a
 
 valid        line 4 cols 2-6 is T_Identifier 
-string       line 4 cols 8-13 is T_String 
+string       line 4 cols 8-13 is T_CONSTSTRING
 constant     line 4 cols 15-22 is T_Identifier 
 
 *** Error line 4.
