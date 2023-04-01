@@ -29,8 +29,8 @@ false        line 17 cols 1-5 is T_BOOLCONST
 (            line 30 cols 1-1 is T_OPEN_ROUND_BRACKET
 )            line 31 cols 1-1 is T_CLOSE_ROUND_BRACKET
 ||           line 32 cols 1-2 is T_OR
-<=           line 33 cols 1-2 is t_LESS_OR_EQUALS_CHAR
->=           line 34 cols 1-2 is t_MORE_OR_EQUALS_CHAR
+<=           line 33 cols 1-2 is T_LESS_OR_EQUALS_CHAR
+>=           line 34 cols 1-2 is T_MORE_OR_EQUALS_CHAR
 ==           line 35 cols 1-2 is T_EQUALS
 Print        line 36 cols 1-5 is T_PRINT
 ReadInteger  line 37 cols 1-11 is T_READINTEGER

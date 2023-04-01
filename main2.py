@@ -19,15 +19,15 @@ class lexerClass:
         self.out_file = out_file
 
     """
-    LESS_CHAR         - <
+    LESS_CHAR           - <
     LESS_OR_EQUALS_CHAR - <=
-    MORE_CHAR         - >
+    MORE_CHAR           - >
     MORE_OR_EQUALS_CHAR - >=
-    ASSIGNMENT       - =
-    EQUALS           - ==
+    ASSIGNMENT          - =
+    EQUALS              - ==
     """
-    tokens = ("DOUBLE_NUMBER", 'BOOLCONST', 'T_ERROR_LONG_IDENTIFIER', 'IDENTIFIER', "SINGLE_COMMENT",
-              "MULTILINE_COMMENT", 'NUMBER',  'PLUS',
+    tokens = ["DOUBLE_NUMBER", 'BOOLCONST', 'T_ERROR_LONG_IDENTIFIER', 'IDENTIFIER', "SINGLE_COMMENT",
+              "MULTILINE_COMMENT", 'NUMBER', 'PLUS',
               'MINUS', 'TIMES', 'NOT_EQUALS', 'AND', 'OR', 'SCREAM',
               'SEMICOLON', 'COMMA', 'POINT', 'OPEN_SQUARE_BRACKET',
               'CLOSE_SQUARE_BRACKET', 'OPEN_ROUND_BRACKET',
@@ -36,7 +36,7 @@ class lexerClass:
               'DOUBLE_BRACES', 'DIVIDE', 'EQUALS', 'LPAREN', 'RPAREN',
               "PERCENT", "LESS_CHAR", "LESS_OR_EQUALS_CHAR",
               "MORE_CHAR", "MORE_OR_EQUALS_CHAR", "ASSIGNMENT",
-              "CONSTSTRING", "MULTILINE_NON_CLOSED_COMMENT", 'ID')
+              "CONSTSTRING", "MULTILINE_NON_CLOSED_COMMENT"]
 
     # Tokens
 
@@ -57,6 +57,7 @@ class lexerClass:
             print("Integer value too large %d" % t.value)
             t.value = 0
         return t
+
     def T_MULTILINE_NON_CLOSED_COMMENT(self, t):
         r'\/\*.+'
         raise RuntimeError("Комментарий не закрыт!")
@@ -113,9 +114,9 @@ class lexerClass:
         # "(([a - zA - Z_]([a - zA - Z0 - 9_]{1, 30})?) | (\d))\ / (([a - zA - Z_]([a - zA - Z0 - 9_]{1, 30})?) | (\d))"
         return t
 
-    def t_ASSIGNMENT(self, t):
-        r"="
-        return t
+    # def t_ASSIGNMENT(self, t):
+    #     r"="
+    #     return t
 
     def t_OPEN_ROUND_BRACKET(self, t):
         r"\("
@@ -141,13 +142,13 @@ class lexerClass:
         r'\}'
         return t
 
-    def t_LESS_CHAR(self, t):
-        r"<"
-        return t
+    # def t_LESS_CHAR(self, t):
+    #     r"<"
+    #     return t
 
-    def t_MORE_CHAR(self, t):
-        r">"
-        return t
+    # def t_MORE_CHAR(self, t):
+    #     r">"
+    #     return t
 
     t_ignore = " \r\t\f"
 
@@ -163,17 +164,19 @@ class lexerClass:
         self.file.writelines([f"\n*** Error line {t.lexer.lineno}.\n", f"*** Unrecognized char: '{t.value[0]}'\n"])
         t.lexer.skip(1)
 
-    def t_ID(self, t):
-        r'[a-zA-Z_][a-zA-Z_0-9]*'
-        t.type = self.reserved.get(t.value, 'ID')
+    def t_IDENTIFIER(self, t):
+        r'[a-zA-Z_]([a-zA-Z0-9_]{1,29})?' # Имя переменной. Длина не более 31 символа.
+        t.type = self.reserved.get(t.value, 'IDENTIFIER')
         return t
 
     reserved = {
         'void': 'VOID',
-        'Doible': 'DOUBLE',
-        'Int': 'INT',
-        'Bool': 'BOOL',
-        'String': 'STRING',
+        'double': 'DOUBLE',
+        'int': 'INT',
+        'bool': 'BOOL',
+        'string': 'STRING',
+        'true': 'BOOLCONST',
+        'false': 'BOOLCONST',
         'class': 'CLASS',
         'interface': 'INTERFACE',
         'null': 'NULL',
@@ -183,6 +186,7 @@ class lexerClass:
         'for': 'FOR',
         'while': 'WHILE',
         'if': 'IF',
+        'else': 'ELSE',
         'return': 'RETURN',
         'break': 'BREAK',
         'new': 'NEW',
@@ -194,10 +198,9 @@ class lexerClass:
 
     tokens += list(reserved.values())
 
-    t_IDENTIFIER = r'[a-zA-Z_]([a-zA-Z0-9_]{1,29})?'  # Имя переменной. Длина не более 31 символа.
+    #t_BOOLCONST = r'true|false'
     t_MULTILINE_COMMENT = r'\/\*(.|\n)*?\*\/'
     t_SINGLE_COMMENT = r'//.*\n?'
-    t_BOOLCONST = r'true|false'
     t_DOUBLE_SQUARE_BRACKETS = r'\[\]'
     t_DOUBLE_ROUND_BRACKETS = r'\(\)'
     t_DOUBLE_BRACES = r'\{\}'
@@ -208,6 +211,9 @@ class lexerClass:
     t_NOT_EQUALS = r'!='
     t_LESS_OR_EQUALS_CHAR = r'<='
     t_MORE_OR_EQUALS_CHAR = r'>='
+    t_ASSIGNMENT = r'='
+    t_MORE_CHAR = r'>'
+    t_LESS_CHAR = r'<'
 
     def start(self, data: str, out_file="outTest/result.txt"):
         self.out_file = out_file

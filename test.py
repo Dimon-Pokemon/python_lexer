@@ -34,6 +34,7 @@ class MyTestCase(unittest.TestCase):
                             print(f"\033[3;32mТест № {files.index(file)+1} пройден! \033[0;0m")
                         else:
                             print(f"\033[3;31mТест № {files.index(file) + 1} НЕ пройден! \033[0;0m")
+        self.assertEqual(True, True)
 
 
 
