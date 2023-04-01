@@ -50,11 +50,13 @@ class lexerClass:
         return t
 
     def t_NUMBER(self, t):
-        r'\d+'
+        r'(0(x|X)[0-9a-fA-F]+)|(\d+)'
         try:
             t.value = int(t.value)
+        except TypeError:
+            t.value = int(t.value, 16)
         except ValueError:
-            print("Integer value too large %d" % t.value)
+            print(f"Integer value too large {t.value}")
             t.value = 0
         return t
 
@@ -198,7 +200,6 @@ class lexerClass:
 
     tokens += list(reserved.values())
 
-    #t_BOOLCONST = r'true|false'
     t_MULTILINE_COMMENT = r'\/\*(.|\n)*?\*\/'
     t_SINGLE_COMMENT = r'//.*\n?'
     t_DOUBLE_SQUARE_BRACKETS = r'\[\]'

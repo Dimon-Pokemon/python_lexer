@@ -1,0 +1,16 @@
+"valid"      line 3 cols 1-7 is T_CONSTSTRING 
+""           line 5 cols 1-2 is T_CONSTSTRING 
+" "          line 7 cols 1-3 is T_CONSTSTRING 
+"white space can exist in strings" line 9 cols 1-34 is T_CONSTSTRING
+"more"       line 11 cols 1-6 is T_CONSTSTRING 
+"than"       line 11 cols 7-12 is T_CONSTSTRING
+"one"        line 11 cols 13-17 is T_CONSTSTRING
+"string"     line 11 cols 18-25 is T_CONSTSTRING
+"per"        line 11 cols 26-30 is T_CONSTSTRING
+"line"       line 11 cols 31-36 is T_CONSTSTRING
+"even"       line 13 cols 1-6 is T_CONSTSTRING 
+"strings"    line 13 cols 7-15 is T_CONSTSTRING
+"next"       line 13 cols 16-21 is T_CONSTSTRING 
+"to"         line 13 cols 22-25 is T_CONSTSTRING 
+"strings"    line 13 cols 26-34 is T_CONSTSTRING 
+"@ can exist in strings" line 15 cols 1-24 is T_CONSTSTRING

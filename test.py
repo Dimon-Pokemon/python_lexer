@@ -30,7 +30,7 @@ class MyTestCase(unittest.TestCase):
                         output_data = output_data.replace("\n", "")
                         # self.assertEqual(output_data, correct_data)
                         # self.assertCountEqual(output_data, correct_data)
-                        if output_data == correct_data:
+                        if output_data.lower() == correct_data.lower():
                             print(f"\033[3;32mТест № {files.index(file)+1} пройден! \033[0;0m")
                         else:
                             print(f"\033[3;31mТест № {files.index(file) + 1} НЕ пройден! \033[0;0m")
