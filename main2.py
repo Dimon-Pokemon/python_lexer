@@ -8,7 +8,8 @@ import re
 class lexerClass:
     out_file: str = ""
     count_pos = 1  # Счетчик символов. Его время от времени будем сбрасывать
-    last_line = 1  # Переменная для хранения номера прошлой строки. Если не совпадает, надо сбросить count
+    last_line = 0  # Переменная для хранения номера прошлой строки. Если не совпадает, надо сбросить count
+    len_last_token = 0
     file = "";
 
     def __init__(self, out_file="result.out"):
@@ -25,8 +26,8 @@ class lexerClass:
     ASSIGNMENT       - =
     EQUALS           - ==
     """
-    tokens = ('IDENTIFIER', "SINGLE_COMMENT", "MULTILINE_COMMENT",
-              'NUMBER', "DOUBLE_NUMBER", 'PLUS',
+    tokens = ("DOUBLE_NUMBER", 'BOOLCONST', 'T_ERROR_LONG_IDENTIFIER', 'IDENTIFIER', "SINGLE_COMMENT",
+              "MULTILINE_COMMENT", 'NUMBER',  'PLUS',
               'MINUS', 'TIMES', 'NOT_EQUALS', 'AND', 'OR', 'SCREAM',
               'SEMICOLON', 'COMMA', 'POINT', 'OPEN_SQUARE_BRACKET',
               'CLOSE_SQUARE_BRACKET', 'OPEN_ROUND_BRACKET',
@@ -35,52 +36,35 @@ class lexerClass:
               'DOUBLE_BRACES', 'DIVIDE', 'EQUALS', 'LPAREN', 'RPAREN',
               "PERCENT", "LESS_CHAR", "LESS_OR_EQUALS_CHAR",
               "MORE_CHAR", "MORE_OR_EQUALS_CHAR", "ASSIGNMENT",
-              "VOID", "INT", "DOUBLE", "BOOL", "STRING", "CONSTSTRING",
-              "CLASS", "INTERFACE", "NULL", "THIS", "EXTENDS",
-              "IMPLEMENTS", "FOR", "WHILE", "IF", "ELSE",
-              "RETURN", "BREAK", "NEW", "NEWARRAY", "PRINT",
-              "READINTEGER", "READLINE", "MULTILINE_NON_CLOSED_COMMENT")
+              "CONSTSTRING", "MULTILINE_NON_CLOSED_COMMENT", 'ID')
 
     # Tokens
-    t_SINGLE_COMMENT = r'//.*\n?'
-    t_MULTILINE_COMMENT = r'\/\*(.|\n)*?\*\/'
-    t_EQUALS = r"=="
-    t_NOT_EQUALS = r'!='
-    t_AND = r'\&\&'
-    t_OR = r'\|\|'
-    t_LESS_OR_EQUALS_CHAR = r'<='
-    t_MORE_OR_EQUALS_CHAR = r'>='
-    t_DOUBLE_SQUARE_BRACKETS = r'\[\]'
-    t_DOUBLE_ROUND_BRACKETS = r'\(\)'
-    t_DOUBLE_BRACES = r'\{\}'
-    t_VOID = r'void'
-    t_DOUBLE = r'Double'
-    t_INT = r'Int'
-    t_BOOL = r'Bool'
-    t_STRING = r'String'
-    t_CONSTSTRING = r'".*"'
-    t_CLASS = r'class'
-    t_INTERFACE = r'interface'
-    t_NULL = r'null'
-    t_THIS = r'this'
-    t_EXTENDS = r'extends'
-    t_IMPLEMENTS = r'implements'
-    t_FOR = r'for'
-    t_WHILE = r'while'
-    t_IF = r'if'
-    t_ELSE = r'else'
-    t_RETURN = r'return'
-    t_BREAK = r'break'
-    t_NEW = r'new'
-    t_NEWARRAY = r'NewArray'
-    t_PRINT = r'Print'
-    t_READINTEGER = r'ReadInteger'
-    t_READLINE = r'ReadLine'
-    t_IDENTIFIER = r'[a-zA-Z_]([a-zA-Z0-9_]{1,30})?'  # Имя переменной. Длина не более 31 символа.
 
+    def t_DOUBLE_NUMBER(self, t):
+        r'[0-9]{1,20}\.[0-9]{0,100}(E|e)(\+|-)([1-9][0-9]?){1,2}'
+        try:
+            t.value = float128(t.value)
+        except ValueError:
+            print("Double value too large ", t.value)
+            t.value = 0
+        return t
+
+    def t_NUMBER(self, t):
+        r'\d+'
+        try:
+            t.value = int(t.value)
+        except ValueError:
+            print("Integer value too large %d" % t.value)
+            t.value = 0
+        return t
     def T_MULTILINE_NON_CLOSED_COMMENT(self, t):
         r'\/\*.+'
-        raise RuntimeError("Комментарий не закрыйт!")
+        raise RuntimeError("Комментарий не закрыт!")
+
+    def T_ERROR_LONG_IDENTIFIER(self, t):
+        r'([a-zA-Z_][a-zA-Z0-9_]{30,100}){1,100}?'
+        self.file.writelines([f"\n*** Error line {self.last_line}\n", f"*** Identifier too long: \"{t.value[0]}\"\n"])
+        t.lexer.skip(1)
 
     def t_SCREAM(self, t):
         r'!'
@@ -94,30 +78,12 @@ class lexerClass:
         r','
         return t
 
-    def t_POINT(self, t):
-        r'\.'
-        return t
-
-    def t_NUMBER(self, t):
-        r'\d+'
-        try:
-            t.value = int(t.value)
-        except ValueError:
-            print("Integer value too large %d" % t.value)
-            t.value = 0
-        return t
-
-    def t_DOUBLE_NUMBER(self, t):
-        r'[0-9]{1,20}\.[0-9]{0,100}E|e(\+|-)([1-9][0-9]?){1,2}'
-        try:
-            t.value = float128(t.value)
-        except ValueError:
-            print("Double value too large ", t.value)
-            t.value = 0
-        return t
-
     def t_PLUS(self, t):
         r"\+"
+        return t
+
+    def t_POINT(self, t):
+        r'\.'
         return t
 
     def t_MINUS(self, t):
@@ -187,15 +153,61 @@ class lexerClass:
 
     def t_newline(self, t):
         r'\n+'
-        self.last_line = t.lexer.lineno
+        # self.last_line = t.lexer.lineno
         t.lexer.lineno += t.value.count("\n")
-        self.count_pos += 1
+        self.count_pos = 1
 
     def t_error(self, t):
-        #with open(self.out_file, "a") as f:
-        #print(f"\n*** Error line {self.last_line}\n", file=self.file)
-        self.file.writelines([f"\n*** Error line {self.last_line}\n", f"*** Unrecognized char: '{t.value[0]}'\n"])
+        # with open(self.out_file, "a") as f:
+        # print(f"\n*** Error line {self.last_line}\n", file=self.file)
+        self.file.writelines([f"\n*** Error line {t.lexer.lineno}.\n", f"*** Unrecognized char: '{t.value[0]}'\n"])
         t.lexer.skip(1)
+
+    def t_ID(self, t):
+        r'[a-zA-Z_][a-zA-Z_0-9]*'
+        t.type = self.reserved.get(t.value, 'ID')
+        return t
+
+    reserved = {
+        'void': 'VOID',
+        'Doible': 'DOUBLE',
+        'Int': 'INT',
+        'Bool': 'BOOL',
+        'String': 'STRING',
+        'class': 'CLASS',
+        'interface': 'INTERFACE',
+        'null': 'NULL',
+        'this': 'THIS',
+        'extends': 'EXTENDS',
+        'implements': 'IMPLEMENTS',
+        'for': 'FOR',
+        'while': 'WHILE',
+        'if': 'IF',
+        'return': 'RETURN',
+        'break': 'BREAK',
+        'new': 'NEW',
+        'NewArray': 'NEWARRAY',
+        'Print': 'PRINT',
+        'ReadInteger': 'READINTEGER',
+        'ReadLine': 'READLINE'
+    }
+
+    tokens += list(reserved.values())
+
+    t_IDENTIFIER = r'[a-zA-Z_]([a-zA-Z0-9_]{1,29})?'  # Имя переменной. Длина не более 31 символа.
+    t_MULTILINE_COMMENT = r'\/\*(.|\n)*?\*\/'
+    t_SINGLE_COMMENT = r'//.*\n?'
+    t_BOOLCONST = r'true|false'
+    t_DOUBLE_SQUARE_BRACKETS = r'\[\]'
+    t_DOUBLE_ROUND_BRACKETS = r'\(\)'
+    t_DOUBLE_BRACES = r'\{\}'
+    t_AND = r'\&\&'
+    t_OR = r'\|\|'
+    t_CONSTSTRING = r'"([^"])*"'
+    t_EQUALS = r"=="
+    t_NOT_EQUALS = r'!='
+    t_LESS_OR_EQUALS_CHAR = r'<='
+    t_MORE_OR_EQUALS_CHAR = r'>='
 
     def start(self, data: str, out_file="outTest/result.txt"):
         self.out_file = out_file
@@ -208,18 +220,19 @@ class lexerClass:
                     break
                 # print(tok)
                 token = tok.__dict__
-                if token["lineno"] == self.last_line and i != 0:
-                    self.count_pos += len(str(token["value"]))
+                # self.count_pos += len(token["value"])
+                if self.last_line == token["lineno"]:
+                    self.count_pos += self.len_last_token
                 else:
                     self.count_pos = 1
                 self.file.write("{0} line {1} cols {2}-{3} is {4}\n".format(str(token["value"]), str(token["lineno"]),
-                                                                       str(self.count_pos),
-                                                                       str(len(str(token["value"]))+self.count_pos-1),
-                                                                       "T_"+str(token["type"])))
-
+                                                                            self.count_pos,
+                                                                            str(len(
+                                                                                str(token[
+                                                                                        "value"])) + self.count_pos - 1),
+                                                                            "T_" + str(token["type"])))
+                self.len_last_token = len(str(token["value"]))
                 self.last_line = token["lineno"]
-            self.last_line = 1
-            self.count_pos = 1
 
 
 if __name__ == "__main__":

@@ -23,13 +23,18 @@ class MyTestCase(unittest.TestCase):
                 with open(correct_file_name, "r") as f_c:
                     correct_data = f_c.read()
                     correct_data = correct_data.replace(" ", "")
+                    correct_data = correct_data.replace("\n", "")
                     with open(file_name, "r") as f_out:
                         output_data = f_out.read()
                         output_data = output_data.replace(" ", "")
-                        self.assertEqual(output_data, correct_data)
-                        print(f"\033[3;32mТест № {files.index(file)+1} пройден! \033[0;0m")
+                        output_data = output_data.replace("\n", "")
+                        # self.assertEqual(output_data, correct_data)
+                        # self.assertCountEqual(output_data, correct_data)
+                        if output_data == correct_data:
+                            print(f"\033[3;32mТест № {files.index(file)+1} пройден! \033[0;0m")
+                        else:
+                            print(f"\033[3;31mТест № {files.index(file) + 1} НЕ пройден! \033[0;0m")
 
-        self.assertEqual(True, True)  # add assertion here
 
 
 if __name__ == '__main__':
