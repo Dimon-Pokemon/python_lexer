@@ -1,8 +1,5 @@
 from numpy import float128
-from os import listdir
 import ply.lex as lex
-from ply.lex import TOKEN
-import re
 
 
 class lexerClass:
@@ -10,7 +7,7 @@ class lexerClass:
     count_pos = 1  # Счетчик символов. Его время от времени будем сбрасывать
     last_line = 0  # Переменная для хранения номера прошлой строки. Если не совпадает, надо сбросить count
     len_last_token = 0
-    file = "";
+    file = ""
 
     def __init__(self, out_file="result.out"):
         self.out_file = out_file
@@ -41,7 +38,7 @@ class lexerClass:
     # Tokens
 
     def t_DOUBLE_NUMBER(self, t):
-        r'[0-9]{1,20}\.[0-9]{0,100}(E|e)(\+|-)([1-9][0-9]?){1,2}'
+        r'((0([1][0-9]{0,18})?)|([1-9][0-9]{0,19}))\.[0-9]{0,100}((E|e)(\+|-)?([1-9][0-9]?))?' #[0-9][0-9]{0,10}\.[0-9]{0,100}((E|e)(\+|-)?([1-9][0-9]?))?
         try:
             t.value = float128(t.value)
         except ValueError:
@@ -97,29 +94,6 @@ class lexerClass:
         r"\*"
         return t
 
-    """
-    Итак, возникла проблема, связанная с тем, что регулярное выражение вида r'/'
-    срабатывает на многострочные комментарии, т.е. строку '/**/' лексер воспринимает как два деления и умножения.
-    Решение этой проблемы я наше в том, что указать, что после косой черты не должен идти символ умножения,
-    т.е. '/[^\*]', где 
-    '/' - знак деления, 
-    [^\*] - класс символов, которые могут быть на следующей позиции после предыдущего знака '/', т.е.
-    в данном случае может быть любой символ, кроме '*', потому что '/*' обозначает начало многострочного коммента. 
-    Но тогда появляется побочный эффект - т.к. в регулярке указаны два символа, то соответственно не получается применить функцию
-    ord, т.к. она работает с одним символом. Но мы точно знаем, что первый символ - это символ косой черты, а следователньо можем
-    взять первый символ строки [0]. Это и есть костыль.   
-    """
-
-    def t_DIVIDE(self, t):
-        r'/'  # /[^\*\/]
-        # r"((%s)|(\d))\/((%s)|(\d))"%(t_IDENTIFIER, t_IDENTIFIER)
-        # "(([a - zA - Z_]([a - zA - Z0 - 9_]{1, 30})?) | (\d))\ / (([a - zA - Z_]([a - zA - Z0 - 9_]{1, 30})?) | (\d))"
-        return t
-
-    # def t_ASSIGNMENT(self, t):
-    #     r"="
-    #     return t
-
     def t_OPEN_ROUND_BRACKET(self, t):
         r"\("
         return t
@@ -143,14 +117,6 @@ class lexerClass:
     def t_CLOSE_BRACE(self, t):
         r'\}'
         return t
-
-    # def t_LESS_CHAR(self, t):
-    #     r"<"
-    #     return t
-
-    # def t_MORE_CHAR(self, t):
-    #     r">"
-    #     return t
 
     t_ignore = " \r\t\f"
 
@@ -215,6 +181,7 @@ class lexerClass:
     t_ASSIGNMENT = r'='
     t_MORE_CHAR = r'>'
     t_LESS_CHAR = r'<'
+    t_DIVIDE = r'/'
 
     def start(self, data: str, out_file="outTest/result.txt"):
         self.out_file = out_file
