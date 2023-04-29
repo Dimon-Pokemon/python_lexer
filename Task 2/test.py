@@ -2,7 +2,7 @@ import unittest
 from os import listdir
 from re import match
 
-import main2
+import main
 
 
 class MyTestCase(unittest.TestCase):
