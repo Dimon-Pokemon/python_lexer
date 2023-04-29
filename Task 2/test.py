@@ -23,7 +23,7 @@ class MyTestCase(unittest.TestCase):
         """
         files: list = listdir("inputData")  # Получаем список всех имен файло в директории(каталоге) inputDat
         files.sort() # сортируем список файлов
-        lxr: "lexerClass" = main2.lexerClass()  # Создаем экземпляр класса lexerClasss
+        lxr: "lexerClass" = main.lexerClass()  # Создаем экземпляр класса lexerClasss
         for file in files:  # Перебираем все имена файлов из массива 'files', поместив поочередно каждое имя в переменную 'file'
             # match(".*\.", file).group(0) выбдергивает имя файла из названия name.txt (т.е. без расширения)
             file_name = "outTest/" + match(".*\.", file).group(0) + "out"  # Путь до выходного файла.
