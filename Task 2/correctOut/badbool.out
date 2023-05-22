@@ -1,4 +1,4 @@
-TRUE         line 1 cols 1-4 is T_IDENTIFIER
+TRUE        line 1 cols 1-4 is T_IDENTIFIER
 FALSE        line 3 cols 1-5 is T_IDENTIFIER
 True         line 5 cols 1-4 is T_IDENTIFIER
 False        line 7 cols 1-5 is T_IDENTIFIER
