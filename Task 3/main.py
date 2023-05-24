@@ -3,10 +3,8 @@
 from parser import build_tree
 
 data = '''
-<?php
-$val = 5;
-$result = substr( "foobar", 2*(7-$val) ); /* comment */
-echo "это наш результат: ", $result;
+2.25
+2.77 lexer
 '''
 
 result = build_tree(data)
