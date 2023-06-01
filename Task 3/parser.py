@@ -1,6 +1,6 @@
 # coding=utf8
 
-from lexer import lexerClass
+import lexer as lex
 import ply.yacc as yacc
 
 
@@ -9,7 +9,7 @@ class Node:
     def parts_str(self):
         st = []
         for part in self.parts:
-            st.append( str( part ) )
+            st.append(str(part))
         return "\n".join(st)
 
     def __repr__(self):
@@ -24,121 +24,102 @@ class Node:
         self.parts = parts
 
 
-def p_double_number(self, p):
-    '''
-    double_number :
-                  | IDENTIFIER
-    '''
+class Parser:
 
-# def p_php(p):
-#     '''php :
-#            | PHPSTART phpbody'''
-#     if len(p) == 1:
-#         p[0] = None
-#     else:
-#         p[0] = p[2]
-#
-# def p_phpbody(p):
-#     '''phpbody :
-#                | phpbody phpline phpcolons'''
-#     if len(p) > 1:
-#         if p[1] is None:
-#             p[1] = Node('body', [])
-#         p[0] = p[1].add_parts([p[2]])
-#     else:
-#         p[0] = Node('body', [])
-#
-# def p_phpcolons(p):
-#     '''phpcolons : PHPCOLON
-#                  | phpcolons PHPCOLON'''
-#
-# def p_phpline(p):
-#     '''phpline : assign
-#                | func
-#                | PHPECHO args'''
-#     if len(p) == 2:
-#         p[0] = p[1]
-#     else:
-#         p[0] = Node('echo', [p[2]])
-#
-# def p_assign(p):
-#     '''assign : PHPVAR PHPEQUAL expr'''
-#     p[0] = Node('assign', [p[1], p[3]])
-#
-# def p_expr(p):
-#     '''expr : fact
-#             | expr PLUSMINUS fact'''
-#     if len(p) == 2:
-#         p[0] = p[1]
-#     else:
-#         p[0] = Node(p[2], [p[1], p[3]])
-#
-# def p_fact(p):
-#     '''fact : term
-#             | fact DIVMUL term'''
-#     if len(p) == 2:
-#         p[0] = p[1]
-#     else:
-#         p[0] = Node(p[2], [p[1], p[3]])
-#
-# def p_term(p):
-#     '''term : arg
-#             | PHPOPEN expr PHPCLOSE'''
-#     if len(p) == 2:
-#         p[0] = p[1]
-#     else:
-#         p[0] = p[2]
-#
-# def p_func(p):
-#     '''func : PHPFUNC PHPOPEN args PHPCLOSE'''
-#     p[0] = Node('func', [p[1], p[3]])
-#
-# def p_args(p):
-#     '''args :
-#             | expr
-#             | args PHPCOMA expr'''
-#     if len(p) == 1:
-#         p[0] = Node('args', [])
-#     elif len(p) == 2:
-#         p[0] = Node('args', [p[1]])
-#     else:
-#         p[0] = p[1].add_parts([p[3]])
-#
-# def p_arg(p):
-#     '''arg : string
-#            | phpvar
-#            | PHPNUM
-#            | func'''
-#     p[0] = Node('arg', [p[1]])
-#
-# def p_phpvar(p):
-#     '''phpvar : PHPVAR'''
-#     p[0] = Node('var', [p[1]])
-#
-# def p_string(p):
-#     '''string : PHPSTRING str PHPSTRING'''
-#     p[0] = p[2]
-#
-# def p_str(p):
-#     '''str :
-#            | STR
-#            | str phpvar'''
-#     if len(p) == 1:
-#         p[0] = Node('str', [''])
-#     elif len(p) == 2:
-#         p[0] = Node('str', [p[1]])
-#     else:
-#         p[0] = p[1].add_parts([p[2]])
+    def p_init_variable(p):
+        """
+         variable : type identifier assignment boolconst
+              | type identifier assignment double_number
+              | type identifier assignment number
+              | type identifier assignment conststring
+        """
+        if p[0] == 'BOOL':
+            p[0] = Node('IDENTIFIER_BOOL', [p[1]])
+        elif p[0] == 'DOUBLE':
+            p[0] = Node('IDENTIFIER_DOUBLE', [p[1]])
+        elif p[0] == 'INT':
+            p[0] = Node('IDENTIFIER_INT', [p[1]])
+        elif p[0] == 'STRING':
+            p[0] = Node('IDENTIFIER_INT', [p[1]])
+        else:
+            p[0] = Node("INIT_VARIABLE", [p[1], p[2], p[3], p[4]])
+
+    def p_assignment(p):
+        """
+        assignment : ASSIGNMENT
+        """
+        p[0] = Node("ASSIGNMENT", [p[1]])
+
+    def p_boolconst(p):
+        """
+         boolconst : BOOLCONST
+        """
+        p[0] = Node("BOOLCONST", [p[1]])
+
+    def p_double_number(p):
+        """
+         double_number : DOUBLE_NUMBER
+        """
+        p[0] = Node("DOUBLE_NUMBER", [p[1]])
+
+    def p_number(p):
+        """
+         number : NUMBER
+        """
+        p[0] = Node("NUMBER", [p[1]])
+
+    def p_conststring(p):
+        """
+         conststring : CONSTSTRING
+        """
+        p[0] = Node("CONSTSTRING", [p[1]])
+
+    def p_variable_declaration(p):
+        """
+        var_dec : type identifier
+        """
+        p[0] = Node("VARIABLE_DECLARATION", [p[1], p[2]])
+
+    def p_identifier(p):
+        """
+        identifier : IDENTIFIER
+        """
+        p[0] = Node("IDENTIFIER", [p[1]])
+
+    def p_type(p):
+        """
+        type : BOOL
+             | INT
+             | STRING
+             | DOUBLE
+        """
+        p[0] = Node("TYPE", [p[1]])
+
+    def p_string(p):
+        """
+        string : CONSTSTRING
+        """
+        print("It is work")
+        p[0] = Node("STRING", [p[1]])
 
 
-tokens = lexerClass.tokens
-reserved = lexerClass.reserved
-parser = yacc.yacc()
+
+    lexer = None
+    tokens = lex.lexerClass.tokens
+    print(tokens)
+    reserved = lex.lexerClass.reserved
 
 
-def build_tree(code):
-    return parser.parse(code)
+    def __init__(self, code):
+        self.lexer = lex.lexerClass()
+        self.lexer.start(code)
+
+    def build_tree(self, code):
+        return self.parser.parse(code)
+
+    def p_error(p):
+        print ( 'Unexpected token:', p )
+
+    parser = yacc.yacc()
 
 
-def p_error(p):
-    print ( 'Unexpected token:', p )

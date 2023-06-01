@@ -1,11 +1,26 @@
 # coding=utf8
 
-from parser import build_tree
+from parser import Parser
 
-data = '''
-2.25
-2.77 lexer
-'''
 
-result = build_tree(data)
-print( result )
+
+
+
+if __name__ == "__main__":
+    # data = '''
+    # int p = gjklrtjglkrtdj
+    # '''
+
+    # data = """
+    # int p = 25
+    # """
+
+    data = """
+    int ItIsInteger = 125
+    """
+
+    parser = Parser(data)
+    parser.build_tree(data)
+    result = parser.build_tree(data)
+
+    print(result)

@@ -22,14 +22,6 @@ class lexerClass:
     def set_out_file(self, out_file: str):
         self.out_file = out_file
 
-    # @staticmethod
-    # def get_reserved(self):
-    #     return self.reserved
-    #
-    # @staticmethod
-    # def get_tokens(self):
-    #     return self.tokens
-
     """
     LESS_CHAR           - <
     LESS_OR_EQUALS_CHAR - <=
@@ -211,7 +203,7 @@ class lexerClass:
     t_LESS_CHAR = r'<'
     t_DIVIDE = r'/'
 
-    def start(self, data: str, out_file="outTest/result.txt"):
+    def start(self, data: str, out_file="result.txt"):
         self.out_file = out_file
         lexer = lex.lex(object=self)
         lexer.input(data)
