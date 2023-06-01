@@ -1,13 +1,26 @@
 # coding=utf8
 
-from parser import build_tree
+from parser import Parser
 
-data = '''
-<?php
-$val = 5;
-$result = substr( "foobar", 2*(7-$val) ); /* comment */
-echo "это наш результат: ", $result;
-'''
 
-result = build_tree(data)
-print( result )
+
+
+
+if __name__ == "__main__":
+    # data = '''
+    # int p = gjklrtjglkrtdj
+    # '''
+
+    # data = """
+    # int p = 25
+    # """
+
+    data = """
+    int ItIsInteger = 125
+    """
+
+    parser = Parser(data)
+    parser.build_tree(data)
+    result = parser.build_tree(data)
+
+    print(result)

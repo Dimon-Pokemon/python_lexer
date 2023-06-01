@@ -21,17 +21,17 @@ class MyTestCase(unittest.TestCase):
 Вот это говнокод
 Всем говнокодом говнокод
         """
-        files: list = listdir("inputData")  # Получаем список всех имен файло в директории(каталоге) inputDat
+        files: list = listdir("/Users/dima/Documents/TGU/Основы компиляции/PR1/lexer/Task 2/inputData")  # Получаем список всех имен файло в директории(каталоге) inputDat
         files.sort() # сортируем список файлов
         lxr: "lexerClass" = main.lexerClass()  # Создаем экземпляр класса lexerClasss
         for file in files:  # Перебираем все имена файлов из массива 'files', поместив поочередно каждое имя в переменную 'file'
             # match(".*\.", file).group(0) выбдергивает имя файла из названия name.txt (т.е. без расширения)
-            file_name = "outTest/" + match(".*\.", file).group(0) + "out"  # Путь до выходного файла.
-            correct_file_name = "correctOut/" + match(".*\.", file).group(0) + "out" # Путь до файла с входными данными для тестирования
+            file_name = "/Users/dima/Documents/TGU/Основы компиляции/PR1/lexer/Task 2/outTest/" + match(".*\.", file).group(0) + "out"  # Путь до выходного файла.
+            correct_file_name = "/Users/dima/Documents/TGU/Основы компиляции/PR1/lexer/Task 2/correctOut/" + match(".*\.", file).group(0) + "out" # Путь до файла с входными данными для тестирования
             if match(".*\.frag", file):  # Если текущий файл - входной, то:
                 print(f"\033[0;33mТест № {files.index(file) + 1}\033[0;0m") # Вывод номера теста
                 print("Тестирование файла:" + f"\033[0;33m{file}\033[0;0m")  # Вывод информации о тестируемом файле.
-                with open("inputData/%s" % file) as f:  # Открываем файл под псевдонимом 'f'.
+                with open("/Users/dima/Documents/TGU/Основы компиляции/PR1/lexer/Task 2/inputData/%s" % file) as f:  # Открываем файл под псевдонимом 'f'.
                     data: str = f.read()  # Считываем весь файл в виде одной строки в переменную data
                     # Вызываем метод 'start' экземпляра класса lxr
                     lxr.start(data, file_name)
