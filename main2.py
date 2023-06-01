@@ -244,4 +244,3 @@ if __name__ == "__main__":
     data = '123+345*(45-33)/233'
     lxr = lexerClass()
     lxr.start(data)
-    ;
